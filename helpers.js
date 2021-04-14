@@ -62,12 +62,15 @@ const JSXHelper = {
     /**
      * mask money
      * event => object
+     * decimal => float
+     * separator_milhar => string
+     * separator_decimal => string
      * return void
      * */
-    money(event){
-        let decimal = 2,
-            separator_milhar = '.',
-            separator_decimal = ',',
+    money(event, decimal = 2, separator_milhar = '.', separator_decimal = ','){
+        let decimal,
+            separator_milhar,
+            separator_decimal,
             decimal_potention = Math.pow(10, decimal),
             separator_thousend = `$1` + separator_milhar,
             override_value,
@@ -201,49 +204,4 @@ const JSXHelper = {
     delCookie(cname){
         document.cookie = `"${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";`;
     }
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
