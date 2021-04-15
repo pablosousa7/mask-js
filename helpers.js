@@ -187,14 +187,17 @@ const JSXHelper = {
 
     /*
     * This function check cookie
-    * el is element show message
+    * el => (string)
+    * return bool
     * */
     checkCookie(el){
-        let user = this.getCookie(el);
+        let status = this.getCookie(el);
 
-        if(user != ""){
-            el.innerHTML = `<div class="p-3 bg-white shadow-sm">Bem-vindo de volta, ${user}</div>`;
+        if(status == "" || status == null){
+            return false;
         }
+
+        return true;
     },
 
 
@@ -204,7 +207,5 @@ const JSXHelper = {
     delCookie(cname){
         document.cookie = `"${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";`;
     }
-
-
 
 }
