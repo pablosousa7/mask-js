@@ -33,6 +33,7 @@ _Você pode usar outros métodos de acordo com sua necessidade, abaixo está a l
 | Função | Descrição |
 | --- | --- |
 | `.money(event)` | Formata o campo com a moeda BRL |
+| `.moneyBr(value, lang, currency` | Formata uma string stática em um valor de moeda |
 | `.cpf(event)` | Formata o campo com a máscara de CPF |
 | `.cnpj(event)` | Formata o campo com a máscara de CNPJ |
 | `.phone(event)` | Formata o campo com a máscara de Telefone (Brasil) |
