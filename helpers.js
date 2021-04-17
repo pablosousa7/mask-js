@@ -58,6 +58,16 @@ const JSXHelper = {
             .replace(/(-\d{2})\d+?$/, "$1");
     },
 
+    /*
+    * Format static value
+    * value => string
+    * lang => language by default is pt-BR
+    * currency => coin local of your country
+    * */
+    moneyBr(value, lang = 'pt-BR', currency = 'BRL'){
+        return new Intl.NumberFormat(lang, { style: 'currency', currency: currency }).format(value);
+    },
+
 
     /**
      * mask money
@@ -90,8 +100,8 @@ const JSXHelper = {
         value_pointer = (override_value / decimal_potention).toFixed(decimal);
         blocks = value_pointer.split('.');
         parts = blocks[0]
-                    .toString()
-                    .replace(/(\d)(?=(\d{3})+(?!\d))/g, separator_thousend);
+            .toString()
+            .replace(/(\d)(?=(\d{3})+(?!\d))/g, separator_thousend);
 
         event.target.value = `R$ ${typeof blocks[1] === 'undefined' ? parts : parts + separator_decimal + blocks[1]}`;
     },
@@ -137,8 +147,8 @@ const JSXHelper = {
 
         event.target.value = v
             .replace(/\D/g, '')
-           .replace(/(\d{5})(\d)/, "$1-$2")
-           .replace(/(-\d{3})\d+?$/, "$1");
+            .replace(/(\d{5})(\d)/, "$1-$2")
+            .replace(/(-\d{3})\d+?$/, "$1");
     },
 
 
@@ -166,22 +176,22 @@ const JSXHelper = {
     * This function return a cookie
     * */
     getCookie(cname){
-      if(!cname) throw new Error('name cookie not specified');
+        if(!cname) throw new Error('name cookie not specified');
 
-      let decodedCookie = decodeURIComponent(document.cookie);
+        let decodedCookie = decodeURIComponent(document.cookie);
 
-      let ca = decodedCookie.split(';');
+        let ca = decodedCookie.split(';');
 
-      for(let i of ca){
-          let c = i.trim();
-          let explode = c.split('=');
+        for(let i of ca){
+            let c = i.trim();
+            let explode = c.split('=');
 
-          if(explode[0] && explode[0] == cname){
-              return `${explode[0]}=${explode[1]}`;
-          }
-      }
+            if(explode[0] && explode[0] == cname){
+                return `${explode[0]}=${explode[1]}`;
+            }
+        }
 
-      return null;
+        return null;
     },
 
 
@@ -207,5 +217,4 @@ const JSXHelper = {
     delCookie(cname){
         document.cookie = `"${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";`;
     }
-
 }
