@@ -41,7 +41,6 @@ _Você pode usar outros métodos de acordo com sua necessidade, abaixo está a l
 | `.setCookie(nome, valor, dias)` | Cria um cookie |
 | `.getCookie(nome)` | Obtêm o cookie |
 | `.checkCookie(nome)` | Verifica se o cookie existe |
-| `.checkCookie(nome)` | Verifica se o cookie existe |
 | `.delCookie(nome)` | Deleta o cookie |
 
 
