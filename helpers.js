@@ -1,220 +1,129 @@
 /**
- * Simple Plugin
- * developer: Pablo Sousa
- * version 1.0
- * licence: GPL
- * */
-
-const JSXHelper = {
-    /**
-     * mask cpf
-     * event => object
-     * return void
-     * */
-    cpf(event){
-        let isObj = typeof event == 'object',
-            isEmpty = event.target.value.length <= 0;
-
-        event.target.setAttribute('maxLength', 14);
-
-        if(!isObj || isEmpty){
-            throw new Error('Bad format object');
+ * Plugin de Máscaras para Input
+ * 
+ * Este plugin fornece funções utilitárias para formatação e máscara de campos de entrada.
+ * Inclui métodos para formatação de CPF, CNPJ, números de telefone, códigos postais e valores monetários.
+ * 
+ * Desenvolvedor: Pablo Sousa
+ * Versão: 1.0
+ * Licença: GPL (Licença Pública Geral)
+ * 
+ * Funcionalidades:
+ * - Formatação de CPF e CNPJ
+ * - Máscaras para números de telefone e códigos postais
+ * - Formatação de valores monetários com separadores decimais e de milhar personalizáveis
+ * - Funções para gerenciamento de cookies: definir, obter, verificar e excluir cookies
+ * 
+ * Uso:
+ * Para utilizar este plugin, chame os métodos estáticos da classe `InputMasker`. Para formatação de campos de entrada, 
+ * certifique-se de passar o objeto de evento para o método apropriado.
+ * 
+ * Exemplo:
+ * ```typescript
+ * document.getElementById('meuInput').addEventListener('input', (event) => {
+ *     InputMasker.cpf(event);
+ * });
+ * ```
+ */
+export class InputMasker {
+    private static ensureInputElement(target: EventTarget | null): HTMLInputElement {
+        if (!(target instanceof HTMLInputElement)) {
+            throw new Error('Target is not an HTMLInputElement');
         }
+        return target;
+    }
 
-        let v = event.target.value;
+    private static removeNonDigits(value: string): string {
+        return value.replace(/\D/g, '');
+    }
 
-        event.target.value = v
-            .replace(/\D/g, '')
+    static cpf(event: Event): void {
+        const target = this.ensureInputElement(event.target);
+        if (!target.value) return;
+
+        target.setAttribute('maxLength', '14');
+        target.value = this.removeNonDigits(target.value)
             .replace(/(\d{3})(\d)/, '$1.$2')
             .replace(/(\d{3})(\d)/, '$1.$2')
             .replace(/(\d{3})(\d{1,2})/, '$1-$2')
             .replace(/(-\d{2})\d+?$/, '$1');
-    },
+    }
 
+    static cnpj(event: Event): void {
+        const target = this.ensureInputElement(event.target);
+        if (!target.value) return;
 
-    /**
-     * mask cnpj
-     * event => object
-     * return void
-     * */
-    cnpj(event){
-        let isObj = typeof event == 'object',
-            isEmpty = event.target.value.length <= 0;
+        target.setAttribute('maxLength', '18');
+        target.value = this.removeNonDigits(target.value)
+            .replace(/(\d{2})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1/$2')
+            .replace(/(\d{4})(\d)/, '$1-$2')
+            .replace(/(-\d{2})\d+?$/, '$1');
+    }
 
-        event.target.setAttribute('maxLength', 18);
+    static formatMoney(value: number, lang: string = 'pt-BR', currency: string = 'BRL'): string {
+        return new Intl.NumberFormat(lang, { style: 'currency', currency }).format(value);
+    }
 
-        if(!isObj || isEmpty){
-            throw new Error('Bad format object');
+    static maskMoney(event: Event, d: number = 2, sm: string = '.', sd: string = ','): void {
+        const target = this.ensureInputElement(event.target);
+        if (!target.value) return;
+
+        target.setAttribute('maxLength', '20');
+        const decimalPotention = Math.pow(10, d);
+        const separatorThousend = sm;
+        let value = this.removeNonDigits(target.value);
+        let valuePointer = (parseFloat(value) / decimalPotention).toFixed(d);
+        let [integerPart, decimalPart] = valuePointer.split('.');
+        let formattedIntegerPart = integerPart.replace(/(\d)(?=(\d{3})+(?!\d))/g, separatorThousend);
+        target.value = `R$ ${decimalPart ? formattedIntegerPart + sd + decimalPart : formattedIntegerPart}`;
+    }
+
+    static maskPhone(event: Event): void {
+        const target = this.ensureInputElement(event.target);
+        if (!target.value) return;
+
+        target.setAttribute('maxLength', '17');
+        const matched = this.removeNonDigits(target.value).match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+        if (matched) {
+            target.value = matched[2] ? `( ${matched[1]} ) ${matched[2]}${matched[3] ? '-' + matched[3] : ''}` : matched[1];
         }
+    }
 
-        let v = event.target.value;
+    static maskPostal(event: Event): void {
+        const target = this.ensureInputElement(event.target);
+        if (!target.value) return;
 
-        event.target.value = v
-            .replace(/\D/g, '')
-            .replace(/(\d{2})(\d)/, "$1.$2")
-            .replace(/(\d{3})(\d)/, "$1.$2")
-            .replace(/(\d{3})(\d)/, "$1/$2")
-            .replace(/(\d{4})(\d)/, "$1-$2")
-            .replace(/(-\d{2})\d+?$/, "$1");
-    },
+        target.setAttribute('maxLength', '9');
+        target.value = this.removeNonDigits(target.value)
+            .replace(/(\d{5})(\d)/, '$1-$2')
+            .replace(/(-\d{3})\d+?$/, '$1');
+    }
 
-    /*
-    * Format static value
-    * value => string
-    * lang => language by default is pt-BR
-    * currency => coin local of your country
-    * */
-    moneyBr(value, lang = 'pt-BR', currency = 'BRL'){
-        return new Intl.NumberFormat(lang, { style: 'currency', currency: currency }).format(value);
-    },
-
-
-    /**
-     * mask money
-     * event => object
-     * d = decimal point (string)
-     * sm = separator milhar (string)
-     * sd = separator decimal (string)
-     * return void
-     * */
-    money(event, d = 2, sm = '.', sd = ','){
-        let decimal = d,
-            separator_milhar = sd,
-            separator_decimal = sd,
-            decimal_potention = Math.pow(10, decimal),
-            separator_thousend = `$1` + separator_milhar,
-            override_value,
-            value_pointer,
-            blocks,
-            parts,
-            isObj = typeof event == 'object',
-            isEmpty = event.target.value.length <= 0;
-
-        if(!isObj || isEmpty){
-            throw new Error('Bad format object');
-        }
-
-        event.target.setAttribute('maxLength', 20);
-
-        override_value = event.target.value.replace(/\D/g, '');
-        value_pointer = (override_value / decimal_potention).toFixed(decimal);
-        blocks = value_pointer.split('.');
-        parts = blocks[0]
-            .toString()
-            .replace(/(\d)(?=(\d{3})+(?!\d))/g, separator_thousend);
-
-        event.target.value = `R$ ${typeof blocks[1] === 'undefined' ? parts : parts + separator_decimal + blocks[1]}`;
-    },
-
-
-    /**
-     * mask phone
-     * event => object
-     * return void
-     * */
-    phone(event){
-        let isObj = typeof event == 'object',
-            isEmpty = event.target.value.length <= 0;
-
-        if(!isObj || isEmpty){
-            throw new Error('Bad format object');
-        }
-
-        event.target.setAttribute('maxLength', 17);
-
-        let v = event.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
-
-        event.target.value = !v[2] ? v[1] : '( ' + v[1] + ' ) ' + v[2] + (v[3] ? '-' + v[3] : '');
-    },
-
-
-    /**
-     * mask postal
-     * event => object
-     * return void
-     * */
-    postal(event){
-        let isObj = typeof event == 'object',
-            isEmpty = event.target.value.length <= 0;
-
-        if(!isObj || isEmpty){
-            throw new Error('Bad format object');
-        }
-
-        event.target.setAttribute('maxLength', 9);
-
-        let v = event.target.value;
-
-        event.target.value = v
-            .replace(/\D/g, '')
-            .replace(/(\d{5})(\d)/, "$1-$2")
-            .replace(/(-\d{3})\d+?$/, "$1");
-    },
-
-
-    /**
-     * This attribute create a cookie
-     *
-     * cname is name of your cookie
-     * cvalue is the value of cookie
-     * exdays is total days
-     * */
-    setCookie(cname, cvalue, exdays){
+    static setCookie(cname: string, cvalue: string, exdays: number = 30): void {
         let d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        let expires = `expires=${d.toUTCString()}`;
+        document.cookie = `${cname}=${cvalue};${expires};path=/`;
+    }
 
-        exdays = exdays ?? 30;
-
-        d.setTime(d.getTime() + (exdays*24*60*60*1000));
-
-        let expires = "expires="+d.toUTCString();
-
-        document.cookie = `${cname}=${cvalue};${expires};path=/`
-    },
-
-
-    /*
-    * This function return a cookie
-    * */
-    getCookie(cname){
-        if(!cname) throw new Error('name cookie not specified');
-
+    static getCookie(cname: string): string | null {
+        if (!cname) throw new Error('Nome do cookie não especificado');
         let decodedCookie = decodeURIComponent(document.cookie);
-
         let ca = decodedCookie.split(';');
-
-        for(let i of ca){
-            let c = i.trim();
-            let explode = c.split('=');
-
-            if(explode[0] && explode[0] == cname){
-                return `${explode[0]}=${explode[1]}`;
-            }
+        for (let cookie of ca) {
+            let [name, value] = cookie.trim().split('=');
+            if (name === cname) return value;
         }
-
         return null;
-    },
+    }
 
+    static checkCookie(cname: string): boolean {
+        return this.getCookie(cname) !== null;
+    }
 
-    /*
-    * This function check cookie
-    * el => (string)
-    * return bool
-    * */
-    checkCookie(el){
-        let status = this.getCookie(el);
-
-        if(status == "" || status == null){
-            return false;
-        }
-
-        return true;
-    },
-
-
-    /**
-     * This attribute delete a cookie especific
-     * */
-    delCookie(cname){
-        document.cookie = `"${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";`;
+    static delCookie(cname: string): void {
+        document.cookie = `${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     }
 }
