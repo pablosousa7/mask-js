@@ -1,3 +1,43 @@
+// ----------------------------------------------
+// WORD COUNT
+// ----------------------------------------------
+import java.util.*;
+
+public class Test {
+    public static void main(String[] args) {
+        String texto = "Java é ótimo. Java é poderoso! Ótimo, não?";
+
+        // Normaliza o texto: tudo minúsculo
+        texto = texto.toLowerCase();
+
+        // Remove pontuação manualmente
+        StringBuilder limpo = new StringBuilder();
+        for (char c : texto.toCharArray()) {
+            if (Character.isLetter(c) || c == ' ') {
+                limpo.append(c);
+            }
+        }
+
+        // Separa palavras
+        String[] palavras = limpo.toString().split(" ");
+
+        // Conta ocorrências
+        Map<String, Integer> contagem = new HashMap<>();
+        for (String palavra : palavras) {
+            if (!palavra.isEmpty()) {
+                contagem.put(palavra, contagem.getOrDefault(palavra, 0) + 1);
+            }
+        }
+
+        // Exibe ordenado por chave
+        contagem.entrySet() // conjunto de pares (palavra, contagem)
+        .stream() // transforma em fluxo
+        .sorted(Map.Entry.comparingByKey()) // ordena por chave ou valor
+        .forEach(entry -> System.out.println(entry.getKey() + " -> " + entry.getValue()));
+
+    }
+}
+
 // --------------------------------------------------------
 // processamento assíncrono de um arquivo CSV em Java
 // --------------------------------------------------------
@@ -62,5 +102,13 @@ public class CsvReactiveProcessor {
         System.out.println("Reativamente processando: " + linha);
     }
 }
+
+// ----------------------------------------------
+// Remove Duplicates from Sorted Array
+// ----------------------------------------------
+// return Arrays.stream(nums).distinct().toArray(); java moderno
+int k = 0;
+for (int i = 0; i < nums.length; i++){ if (i == 0 || nums[i] != nums[i - 1]) nums[k++] = nums[i];}
+return k;
 
 
