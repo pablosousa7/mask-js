@@ -1,5 +1,5 @@
 // ----------------------------------------------
-// WORD COUNT
+// WORD COUNT MODEL 1
 // ----------------------------------------------
 import java.util.*;
 
@@ -38,9 +38,52 @@ public class Test {
     }
 }
 
-// --------------------------------------------------------
-// processamento assíncrono de um arquivo CSV em Java
-// --------------------------------------------------------
+// ----------------WORD COUNT MODEL 2-------------------
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String entrada = scanner.nextLine();
+
+   
+        entrada = entrada.toLowerCase()
+                         .replace(",", " ")
+                         .replace(".", " ")
+                         .replace(";", " ")
+                         .replace("\t", " ")
+                         .replace("\n", " ");
+
+
+        String[] palavras = entrada.trim().split("\\s+");
+
+
+        int contador = 0;
+        for (String palavra : palavras) {
+            if (!palavra.isEmpty()) {
+                contador++;
+            }
+        }
+
+        System.out.println(contador);
+    }
+}
+
+//----Counting Words With a Given Prefix-----------------
+public static int countPrefixes(String[] words, String pref) {
+    int count = 0;
+    for (String word : words) {
+        if (word.startsWith(pref)) {
+            count++;
+        }
+    }
+    return count;
+}
+
+
+// --processamento assíncrono de um arquivo CSV em Java--
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -111,4 +154,19 @@ int k = 0;
 for (int i = 0; i < nums.length; i++){ if (i == 0 || nums[i] != nums[i - 1]) nums[k++] = nums[i];}
 return k;
 
+
+
+//----- MaxWordsInSentence --------
+
+    public class MaxWordsInSentence {
+    public static int mostWordsFound(String[] sentences) {
+        int max = 0;
+        for (String sentence : sentences) {
+            int count = sentence.split(" ").length;
+            if (count > max) {
+                max = count;
+            }
+        }
+        return max;
+    }
 
